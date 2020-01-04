@@ -38,7 +38,7 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
-    ['~/nuxt-packages']
+    ['../../../../../src/index.js']
   ],
   /*
   ** Build configuration
@@ -48,10 +48,10 @@ export default {
     ** You can extend webpack config here
     */
     extend (config, ctx) {
-    }
+    },
   },
 
   packages: [
-    '@dundle/ui'
+    '@example/ui'
   ]
 }
