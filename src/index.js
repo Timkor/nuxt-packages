@@ -27,10 +27,14 @@ export default function(moduleOptions) {
         // Create a module from a package:
         const packageModule = createPackageModule(normalizedPackage);
 
+        // Make sure Nuxt will transpile imported files:
+        this.options.build.transpile.push(normalizedPackage.name);
+
         // Add the module to the module container:
         this.nuxt.moduleContainer.addModule(packageModule);
     })
 
     console.log(moduleOptions);
     console.log(packages);
+    console.log('Transpile:', this.options.build.transpile);
 }
