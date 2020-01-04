@@ -9,6 +9,9 @@
         Example
       </h2>
       <div class="links">
+        
+        <Button>Test</Button>
+        
         <a
           href="https://nuxtjs.org/"
           target="_blank"
@@ -30,10 +33,12 @@
 
 <script>
 import Logo from '~/components/Logo.vue'
+import Button from '@example/ui/components/Button';
 
 export default {
   components: {
-    Logo
+    Logo,
+    Button
   }
 }
 </script>
