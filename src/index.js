@@ -5,13 +5,42 @@ function normalizePackage(packageDescriptor) {
         return {
             name: packageDescriptor
         };
+    } else if (typeof packageDescriptor === 'array') {
+        
+        const [name, options] = packageDescriptor;
+
+        return {
+            name,
+            options
+        };
     }
 }
 
-function createPackageModule(normalizedPackage) {
+function createPackageModule({name}) {
 
-    return function () {
-        console.log('Package module setup', normalizedPackage);
+    return async function () {
+
+        // console.log(this.options);
+        
+        // Make sure Nuxt will transpile imported files from this module:
+        this.options.build.transpile.push(name);
+
+        
+        try {
+            
+            // Resolve index.js in package:
+            const path = require.resolve(name, {
+                paths: this.options.modulesDir
+            });
+
+            console.log('path', path);
+
+        } catch (e) {
+            console.error(e);
+        }
+        
+        console.log('b');
+        console.log('Package module setup', name);
     }
 }
 
@@ -27,14 +56,10 @@ export default function(moduleOptions) {
         // Create a module from a package:
         const packageModule = createPackageModule(normalizedPackage);
 
-        // Make sure Nuxt will transpile imported files:
-        this.options.build.transpile.push(normalizedPackage.name);
-
         // Add the module to the module container:
         this.nuxt.moduleContainer.addModule(packageModule);
     })
 
     console.log(moduleOptions);
-    console.log(packages);
-    console.log('Transpile:', this.options.build.transpile);
+    console.log('Packages', packages);
 }
