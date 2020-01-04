@@ -1,0 +1,24 @@
+{
+  "name": "nuxt-packages",
+  "version": "0.0.1",
+  "description": "Split your Nuxt.js project easily into multiple (npm) packages",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Timkor/nuxt-packages.git"
+  },
+  "keywords": [
+    "nuxt",
+    "packages",
+    "monorepo"
+  ],
+  "author": "Timkor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Timkor/nuxt-packages/issues"
+  },
+  "homepage": "https://github.com/Timkor/nuxt-packages#readme"
+}
