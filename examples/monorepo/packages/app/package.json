@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "@example/app",
   "version": "1.0.0",
   "description": "Example",
   "author": "Timkor",
@@ -11,7 +11,8 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "nuxt": "^2.0.0"
+    "nuxt": "^2.0.0",
+    "@example/ui": "1.0.0"
   },
   "devDependencies": {}
 }
