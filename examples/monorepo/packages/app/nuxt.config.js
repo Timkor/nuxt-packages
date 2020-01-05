@@ -52,6 +52,7 @@ export default {
   },
 
   packages: [
-    '@example/ui'
+    '@example/ui',
+    '@example/utils'
   ]
 }

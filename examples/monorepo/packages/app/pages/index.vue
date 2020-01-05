@@ -10,7 +10,7 @@
       </h2>
       <div class="links">
         
-        <Button>Test</Button>
+        <UI:Button>Test</UI:Button>
         
         <a
           href="https://nuxtjs.org/"
@@ -32,13 +32,22 @@
 </template>
 
 <script>
+import { namespaceComponents } from '@example/utils';
+
 import Logo from '~/components/Logo.vue'
 import Button from '@example/ui/components/Button';
+import Vue from 'vue';
+
+Vue.config.warnHandler = (a) => {
+  console.log(a)
+}
 
 export default {
   components: {
     Logo,
-    Button
+    ...namespaceComponents('UI', {
+      Button
+    })
   }
 }
 </script>
