@@ -1,70 +1,19 @@
 
-function normalizePackage(packageDescriptor) {
-
-    if (typeof packageDescriptor === 'string') {
-        
-        return {
-            name: packageDescriptor
-        };
-
-    } else if (typeof packageDescriptor === 'array') {
-        
-        const [name, options] = packageDescriptor;
-
-        return {
-            name,
-            options
-        };
-    } else if (typeof packageDescriptor === 'object') {
-        
-        return packageDescriptor;
-    }
-}
-
-function createPackageModule({name}) {
-
-    return async function () {
-
-        // console.log(this.options);
-        
-        // Make sure Nuxt will transpile imported files from this module:
-        this.options.build.transpile.push(name);
-
-        
-        try {
-            
-            // Resolve index.js in package:
-            const path = require.resolve(name, {
-                paths: this.options.modulesDir
-            });
-
-            console.log('path', path);
-
-        } catch (e) {
-            console.error(e);
-        }
-        
-        console.log('b');
-        console.log('Package module setup', name);
-    }
-}
+import { normalizePackage } from './helpers/package';
+import { createModule } from './helpers/module';
 
 export default function(moduleOptions) {
 
-    const packages = this.options.packages;
-
-    packages.forEach(packageDescriptor => {
+    this.options.packages.forEach(packageDescriptor => {
 
         // Normalize package:
         const normalizedPackage = normalizePackage(packageDescriptor);
 
         // Create a module from a package:
-        const packageModule = createPackageModule(normalizedPackage);
+        const packageModule = createModule(normalizedPackage);
 
         // Add the module to the module container:
         this.nuxt.moduleContainer.addModule(packageModule);
-    })
-
-    console.log(moduleOptions);
-    console.log('Packages', packages);
+        
+    });
 }
