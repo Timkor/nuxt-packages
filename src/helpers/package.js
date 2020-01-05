@@ -8,7 +8,7 @@ export function normalizePackage(packageDescriptor) {
             name: packageDescriptor
         };
 
-    } else if (typeof packageDescriptor === 'array') {
+    } else if (Array.isArray(packageDescriptor)) {
         
         const [name, options] = packageDescriptor;
 
