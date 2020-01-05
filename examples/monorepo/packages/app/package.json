@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "nuxt": "^2.0.0",
-    "@example/ui": "1.0.0"
+    "@example/ui": "1.0.0",
+    "@example/utils": "1.0.0"
   },
   "devDependencies": {}
 }
