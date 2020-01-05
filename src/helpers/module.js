@@ -11,12 +11,16 @@ function resolvePackage(name, searchPaths) {
     }
 }
 
-async function importPackage(path) {
+async function importPackage(path, nuxt, options) {
 
     const nodeModule = await import(path);
 
-    console.log(nodeModule.default);
+    const { setup, plugins, modules, store } = nodeModule.default;
 
+    if (setup) {
+        setup.call(nuxt, options);
+    }
+    
 }
 
 export function createModule(normalizedPackage) {
@@ -36,7 +40,7 @@ export function createModule(normalizedPackage) {
         const path = resolvePackage(name, this.options.modulesDir);
 
         if (path) {
-            importPackage(path);
+            importPackage(path, this, options);
         }
         
         console.log('b');

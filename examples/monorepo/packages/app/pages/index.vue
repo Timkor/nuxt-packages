@@ -36,11 +36,6 @@ import { namespaceComponents } from '@example/utils';
 
 import Logo from '~/components/Logo.vue'
 import Button from '@example/ui/components/Button';
-import Vue from 'vue';
-
-Vue.config.warnHandler = (a) => {
-  console.log(a)
-}
 
 export default {
   components: {

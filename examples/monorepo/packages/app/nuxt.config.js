@@ -52,7 +52,9 @@ export default {
   },
 
   packages: [
-    '@example/ui',
-    '@example/utils'
+    ['@example/ui'],
+    ['@example/utils', {
+      disableNamespaceWarnings: true
+    }]
   ]
 }

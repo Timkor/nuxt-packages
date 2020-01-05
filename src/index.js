@@ -9,6 +9,8 @@ export default function(moduleOptions) {
         // Normalize package:
         const normalizedPackage = normalizePackage(packageDescriptor);
 
+        console.log('[Packages] Added ', normalizedPackage);
+
         // Create a module from a package:
         const packageModule = createModule(normalizedPackage);
 
