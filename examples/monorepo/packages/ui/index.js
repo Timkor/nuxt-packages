@@ -4,7 +4,6 @@
 
 export default {
     plugins: [
-        'a',
-        'b'
+        '~/plugins/ui.js'
     ]
 }

@@ -15,7 +15,7 @@ export default function(moduleOptions) {
         const packageModule = createModule(normalizedPackage);
 
         // Add the module to the module container:
-        this.nuxt.moduleContainer.addModule(packageModule);
+        this.addModule(packageModule);
         
     });
 }

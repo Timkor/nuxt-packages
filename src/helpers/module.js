@@ -1,3 +1,5 @@
+import path from 'path';
+import { resolvePlugin, normalizePlugin } from './plugin';
 
 function resolvePackage(name, searchPaths) {
     try {
@@ -15,20 +17,14 @@ async function importPackage(path, nuxt, options) {
 
     const nodeModule = await import(path);
 
-    const { setup, plugins, modules, store } = nodeModule.default;
+    // Validate nodeModule.default here with Joi
 
-    if (setup) {
-        setup.call(nuxt, options);
-    }
-    
+    return nodeModule.default;
 }
 
 export function createModule(normalizedPackage) {
 
     const {name, options} = normalizedPackage;
-
-    
-    
 
     return async function () {
 
@@ -37,10 +33,25 @@ export function createModule(normalizedPackage) {
         // Make sure Nuxt will transpile imported files from this module:
         this.options.build.transpile.push(name);
 
-        const path = resolvePackage(name, this.options.modulesDir);
+        const packagePath = resolvePackage(name, this.options.modulesDir);
+
+        
 
         if (path) {
-            importPackage(path, this, options);
+
+            const packageDir = path.dirname(require.resolve(`${name}/package.json`, {
+                paths: this.options.modulesDir
+            }));
+
+            const { setup, plugins, modules, store } = await importPackage(packagePath);
+
+            if (setup) {
+                setup.call(this, options);
+            }
+            
+            if (plugins) {
+                plugins.forEach((pluginDescriptor) => this.addPlugin(resolvePlugin(normalizePlugin(pluginDescriptor), packageDir)));
+            }
         }
         
         console.log('b');
