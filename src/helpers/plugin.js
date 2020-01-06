@@ -15,10 +15,10 @@ export function normalizePlugin(pluginDescriptor) {
     }
 }
 
-export function resolvePlugin(normalizedPlugin, packageDir) {
+export function resolvePlugin(normalizedPlugin, srcDir, packageDir) {
 
     return {
         ...normalizedPlugin,
-        src: path.normalize(normalizedPlugin.src.replace('~', packageDir)).replace(/\\/g, '/')
+        src: path.normalize(path.relative(srcDir, normalizedPlugin.src.replace('~', packageDir))).replace(/\\/g, '/')
     }
 }

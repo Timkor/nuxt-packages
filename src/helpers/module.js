@@ -53,7 +53,9 @@ export function createModule(normalizedPackage) {
                 
                 plugins.forEach((pluginDescriptor) => {
 
-                    const { src, ssr } = resolvePlugin(normalizePlugin(pluginDescriptor), packageDir);
+                    
+
+                    const { src, ssr } = resolvePlugin(normalizePlugin(pluginDescriptor), this.options.srcDir, packageDir);
 
                     const dst = path.join('nuxt-packages/plugins', path.basename(src));
 
@@ -61,7 +63,7 @@ export function createModule(normalizedPackage) {
                         src: path.resolve(__dirname, '../templates/plugin.js'),
                         fileName: dst,
                         options: {
-                            path: src
+                            path: '~/' + src
                         }
                     });
 
