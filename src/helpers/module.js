@@ -50,7 +50,27 @@ export function createModule(normalizedPackage) {
             }
             
             if (plugins) {
-                plugins.forEach((pluginDescriptor) => this.addPlugin(resolvePlugin(normalizePlugin(pluginDescriptor), packageDir)));
+                
+                plugins.forEach((pluginDescriptor) => {
+
+                    const { src, ssr } = resolvePlugin(normalizePlugin(pluginDescriptor), packageDir);
+
+                    const dst = path.join('nuxt-packages/plugins', path.basename(src));
+
+                    const result = this.addTemplate({
+                        src: path.resolve(__dirname, '../templates/plugin.js'),
+                        fileName: dst,
+                        options: {
+                            path: src
+                        }
+                    });
+
+                    console.log(result);
+                    this.options.plugins.push({
+                        src: path.join(this.options.buildDir, dst),
+                        ssr
+                    });
+                });
             }
         }
         

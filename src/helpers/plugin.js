@@ -1,5 +1,5 @@
 
-
+import path from 'path';
 
 export function normalizePlugin(pluginDescriptor) {
 
@@ -19,6 +19,6 @@ export function resolvePlugin(normalizedPlugin, packageDir) {
 
     return {
         ...normalizedPlugin,
-        src: normalizedPlugin.src.replace('~', packageDir)
+        src: path.normalize(normalizedPlugin.src.replace('~', packageDir)).replace(/\\/g, '/')
     }
 }
