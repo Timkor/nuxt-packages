@@ -20,5 +20,10 @@
   "bugs": {
     "url": "https://github.com/Timkor/nuxt-packages/issues"
   },
-  "homepage": "https://github.com/Timkor/nuxt-packages#readme"
+  "homepage": "https://github.com/Timkor/nuxt-packages#readme",
+  "dependencies": {
+    "@nuxt/utils": "^2.11.0",
+    "glob": "^7.1.6",
+    "pify": "^4.0.1"
+  }
 }

@@ -1,5 +1,20 @@
 import path from 'path';
 import { resolvePlugin, normalizePlugin } from './plugin';
+import Glob from 'glob';
+import pify from 'pify';
+
+import { createRoutes } from '@nuxt/utils';
+
+const glob = pify(Glob);
+const supportedExtensions = ['vue', 'js'];
+
+function globPathWithExtensions (path) {
+    return `${path}/**/*.{${supportedExtensions.join(',')}}`
+}
+
+async function resolveFiles(dir) {
+    return await glob(globPathWithExtensions(dir));
+}
 
 function resolvePackage(name, searchPaths) {
     try {
@@ -39,9 +54,11 @@ export function createModule(normalizedPackage) {
 
         if (path) {
 
-            // const packageDir = path.dirname(require.resolve(`${name}/package.json`, {
-            //     paths: this.options.modulesDir
-            // }));
+            const packageDir = path.dirname(require.resolve(`${name}/package.json`, {
+                paths: this.options.modulesDir
+            })).replace(/\\/g, '/') + '/';
+
+            console.log(packageDir);
 
             const { setup, plugins, modules, store } = await importPackage(packagePath);
 
@@ -52,7 +69,7 @@ export function createModule(normalizedPackage) {
             if (plugins) {
                 
                 plugins.forEach((pluginDescriptor) => {
-                    
+
                     const { src, ssr } = normalizePlugin(pluginDescriptor);
 
                     const dst = path.join('nuxt-packages/plugins', path.basename(src));
@@ -70,6 +87,46 @@ export function createModule(normalizedPackage) {
                         ssr
                     });
                 });
+            }
+
+            if (true) {
+                
+                const pagesDir = path.join(packageDir, 'pages').replace(/\\/g, '/');
+                const files = await resolveFiles(pagesDir);
+                
+                if (files.length) {
+
+                    function fixRoute(route) {
+
+                        var children;
+
+                        // Recursively fix children routes:
+                        if (route.children) {
+                            children = route.children.map(fixRoute);
+                        }
+
+                        // Fix this route's chunk name:
+                        return {
+                            ...route,
+                            chunkName: route.chunkName.replace(packageDir, ''),
+                            children
+                        }
+                    }
+
+                    this.extendRoutes((routes) => {
+
+                        const createdRoutes = createRoutes({
+                            files,
+                            srcDir: this.options.srcDir,
+                            pagesDir: pagesDir,
+                            routeNameSplitter: '-',
+                            supportedExtensions: supportedExtensions,
+                            trailingSlash: false
+                        }).map(fixRoute);
+                        
+                        createdRoutes.forEach(createdRoute => routes.push(createdRoute));
+                    });
+                }
             }
         }
     }
