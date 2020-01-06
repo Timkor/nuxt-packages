@@ -1,20 +1,11 @@
 import path from 'path';
 import { resolvePlugin, normalizePlugin } from './plugin';
-import Glob from 'glob';
-import pify from 'pify';
+
+import { resolveFiles } from './files';
 
 import { createRoutes } from '@nuxt/utils';
 
-const glob = pify(Glob);
-const supportedExtensions = ['vue', 'js'];
 
-function globPathWithExtensions (path) {
-    return `${path}/**/*.{${supportedExtensions.join(',')}}`
-}
-
-async function resolveFiles(dir) {
-    return await glob(globPathWithExtensions(dir));
-}
 
 function resolvePackage(name, searchPaths) {
     try {
@@ -123,7 +114,7 @@ export function createModule(normalizedPackage) {
                             supportedExtensions: supportedExtensions,
                             trailingSlash: false
                         }).map(fixRoute);
-                        
+
                         createdRoutes.forEach(createdRoute => routes.push(createdRoute));
                     });
                 }
