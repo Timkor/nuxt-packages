@@ -39,9 +39,9 @@ export function createModule(normalizedPackage) {
 
         if (path) {
 
-            const packageDir = path.dirname(require.resolve(`${name}/package.json`, {
-                paths: this.options.modulesDir
-            }));
+            // const packageDir = path.dirname(require.resolve(`${name}/package.json`, {
+            //     paths: this.options.modulesDir
+            // }));
 
             const { setup, plugins, modules, store } = await importPackage(packagePath);
 
@@ -52,22 +52,19 @@ export function createModule(normalizedPackage) {
             if (plugins) {
                 
                 plugins.forEach((pluginDescriptor) => {
-
                     
-
-                    const { src, ssr } = resolvePlugin(normalizePlugin(pluginDescriptor), this.options.srcDir, packageDir);
+                    const { src, ssr } = normalizePlugin(pluginDescriptor);
 
                     const dst = path.join('nuxt-packages/plugins', path.basename(src));
 
-                    const result = this.addTemplate({
+                    this.addTemplate({
                         src: path.resolve(__dirname, '../templates/plugin.js'),
                         fileName: dst,
                         options: {
-                            path: '~/' + src
+                            path: src.replace('~', name)
                         }
                     });
 
-                    console.log(result);
                     this.options.plugins.push({
                         src: path.join(this.options.buildDir, dst),
                         ssr
@@ -75,8 +72,5 @@ export function createModule(normalizedPackage) {
                 });
             }
         }
-        
-        console.log('b');
-        console.log('Package module setup', name);
     }
 }
