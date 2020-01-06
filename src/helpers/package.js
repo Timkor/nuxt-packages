@@ -1,19 +1,17 @@
 import path from 'path';
 
-export function resolvePackageFile(name, searchPaths) {    
+export function resolvePackage(name, searchPaths) {    
 
-    return require.resolve(name, {
-        paths: searchPaths
-    });
+    return {
+        packageFile: require.resolve(name, {
+            paths: searchPaths
+        }),
+
+        packageDir: path.dirname(require.resolve(`${name}/package.json`, {
+            paths: searchPaths
+        })).replace(/\\/g, '/') + '/'
+    };
 }
-
-export function resolvePackageDir(name, searchPaths) {
-    
-    return path.dirname(require.resolve(`${name}/package.json`, {
-        paths: searchPaths
-    })).replace(/\\/g, '/') + '/';
-}
-
 
 export function normalizePackage(packageDescriptor) {
 

@@ -1,12 +1,10 @@
 import path from 'path';
-import { resolvePackageFile, resolvePackageDir, importPackage } from './package';
+import { resolvePackage, importPackage } from './package';
 import { resolvePlugin, normalizePlugin } from './plugin';
 import { resolveFiles, supportedExtensions } from './files';
 import { createRoutes } from '@nuxt/utils';
 
-export function createModule(normalizedPackage) {
-
-    const {name, options} = normalizedPackage;
+export function createModule({name, options}) {
 
     // Module function:
     return async function () {
@@ -14,82 +12,81 @@ export function createModule(normalizedPackage) {
         // Make sure Nuxt will transpile imported files from this module:
         this.options.build.transpile.push(name);
 
-        const packagePath = resolvePackageFile(name, this.options.modulesDir);
+        // Resolve package paths:
+        const { packageFile, packageDir } = resolvePackage(name, this.options.modulesDir);
 
-        if (path) {
+        // Import and validate:
+        const { setup, plugins, modules, store } = await importPackage(packageFile);
 
-            const packageDir = resolvePackageDir(name, this.options.modulesDir);
-
-            const { setup, plugins, modules, store } = await importPackage(packagePath);
-
-            // Call setup function:
-            if (setup) {
-                setup.call(this, options);
-            }
+        // Call setup function:
+        if (setup) {
+            setup.call(this, options);
+        }
+        
+        // Apply all plugins:
+        if (plugins) {
             
-            // Apply all plugins:
-            if (plugins) {
-                
-                plugins.forEach((pluginDescriptor) => {
+            plugins.forEach((pluginDescriptor) => {
 
-                    const { src, ssr } = normalizePlugin(pluginDescriptor);
+                const { src, ssr } = normalizePlugin(pluginDescriptor);
 
-                    const dst = path.join('nuxt-packages/plugins', path.basename(src));
+                const dst = path.join('nuxt-packages/plugins', path.basename(src));
 
-                    this.addTemplate({
-                        src: path.resolve(__dirname, '../templates/plugin.js'),
-                        fileName: dst,
-                        options: {
-                            path: src.replace('~', name)
-                        }
-                    });
-
-                    this.options.plugins.push({
-                        src: path.join(this.options.buildDir, dst),
-                        ssr
-                    });
+                this.addTemplate({
+                    src: path.resolve(__dirname, '../templates/plugin.js'),
+                    fileName: dst,
+                    options: {
+                        path: src.replace('~', name)
+                    }
                 });
-            }
 
-            // Apply all pages:
-            if (true) {
-                
-                const pagesDir = path.join(packageDir, 'pages').replace(/\\/g, '/');
-                const files = await resolveFiles(pagesDir);
-                
-                if (files.length) {
+                // Add plugin:
+                this.options.plugins.push({
+                    src: path.join(this.options.buildDir, dst),
+                    ssr
+                });
+            });
+        }
 
-                    function fixRoute(route) {
+        // Apply all pages:
+        if (true) {
+            
+            const pagesDir = path.join(packageDir, 'pages').replace(/\\/g, '/');
+            const files = await resolveFiles(pagesDir);
+            
+            if (files.length) {
 
-                        var children;
+                function fixRoute(route) {
 
-                        // Recursively fix children routes:
-                        if (route.children) {
-                            children = route.children.map(fixRoute);
-                        }
+                    var children;
 
-                        // Fix this route's chunk name:
-                        return {
-                            ...route,
-                            chunkName: route.chunkName.replace(packageDir, ''),
-                            children
-                        }
+                    // Recursively fix children routes:
+                    if (route.children) {
+                        children = route.children.map(fixRoute);
                     }
 
-                    this.extendRoutes((routes) => {
-
-                        const createdRoutes = createRoutes({
-                            files,
-                            srcDir: this.options.srcDir,
-                            pagesDir: pagesDir,
-                            routeNameSplitter: '-',
-                            supportedExtensions: supportedExtensions,
-                            trailingSlash: false
-                        }).map(fixRoute);
-
-                        createdRoutes.forEach(createdRoute => routes.push(createdRoute));
-                    });
+                    // Fix this route's chunk name:
+                    return {
+                        ...route,
+                        chunkName: route.chunkName.replace(packageDir, ''),
+                        children
+                    }
                 }
+
+                // Add routes:
+                this.extendRoutes((routes) => {
+
+                    const createdRoutes = createRoutes({
+                        files,
+                        srcDir: this.options.srcDir,
+                        pagesDir: pagesDir,
+                        routeNameSplitter: '-',
+                        supportedExtensions: supportedExtensions,
+                        trailingSlash: false
+                    }).map(fixRoute);
+
+                    createdRoutes.forEach(createdRoute => routes.push(createdRoute));
+                });
             }
         }
     }
