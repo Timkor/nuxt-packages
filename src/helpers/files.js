@@ -3,7 +3,7 @@ import pify from 'pify';
 
 const glob = pify(Glob);
 
-const supportedExtensions = ['vue', 'js'];
+export const supportedExtensions = ['vue', 'js'];
 
 function globPathWithExtensions (path) {
     return `${path}/**/*.{${supportedExtensions.join(',')}}`

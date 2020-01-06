@@ -1,3 +1,18 @@
+import path from 'path';
+
+export function resolvePackageFile(name, searchPaths) {    
+
+    return require.resolve(name, {
+        paths: searchPaths
+    });
+}
+
+export function resolvePackageDir(name, searchPaths) {
+    
+    return path.dirname(require.resolve(`${name}/package.json`, {
+        paths: searchPaths
+    })).replace(/\\/g, '/') + '/';
+}
 
 
 export function normalizePackage(packageDescriptor) {
@@ -20,4 +35,13 @@ export function normalizePackage(packageDescriptor) {
         
         return packageDescriptor;
     }
+}
+
+export async function importPackage(path, nuxt, options) {
+
+    const nodeModule = await import(path);
+
+    // Validate nodeModule.default here with Joi
+
+    return nodeModule.default;
 }

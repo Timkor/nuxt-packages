@@ -1,62 +1,33 @@
 import path from 'path';
+import { resolvePackageFile, resolvePackageDir, importPackage } from './package';
 import { resolvePlugin, normalizePlugin } from './plugin';
-
-import { resolveFiles } from './files';
-
+import { resolveFiles, supportedExtensions } from './files';
 import { createRoutes } from '@nuxt/utils';
-
-
-
-function resolvePackage(name, searchPaths) {
-    try {
-        
-        return require.resolve(name, {
-            paths: searchPaths
-        });
-
-    } catch (e) {
-        return null;
-    }
-}
-
-async function importPackage(path, nuxt, options) {
-
-    const nodeModule = await import(path);
-
-    // Validate nodeModule.default here with Joi
-
-    return nodeModule.default;
-}
 
 export function createModule(normalizedPackage) {
 
     const {name, options} = normalizedPackage;
 
+    // Module function:
     return async function () {
 
-        // console.log(this.options);
-        
         // Make sure Nuxt will transpile imported files from this module:
         this.options.build.transpile.push(name);
 
-        const packagePath = resolvePackage(name, this.options.modulesDir);
-
-        
+        const packagePath = resolvePackageFile(name, this.options.modulesDir);
 
         if (path) {
 
-            const packageDir = path.dirname(require.resolve(`${name}/package.json`, {
-                paths: this.options.modulesDir
-            })).replace(/\\/g, '/') + '/';
-
-            console.log(packageDir);
+            const packageDir = resolvePackageDir(name, this.options.modulesDir);
 
             const { setup, plugins, modules, store } = await importPackage(packagePath);
 
+            // Call setup function:
             if (setup) {
                 setup.call(this, options);
             }
             
+            // Apply all plugins:
             if (plugins) {
                 
                 plugins.forEach((pluginDescriptor) => {
@@ -80,6 +51,7 @@ export function createModule(normalizedPackage) {
                 });
             }
 
+            // Apply all pages:
             if (true) {
                 
                 const pagesDir = path.join(packageDir, 'pages').replace(/\\/g, '/');
