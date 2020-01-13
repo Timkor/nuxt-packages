@@ -22,6 +22,31 @@ export function createModule({name, options}) {
         if (setup) {
             setup.call(this, options);
         }
+
+        // Apply all stores:
+        if (store) {
+            store.forEach(storeDescriptor => {
+                
+                const src = storeDescriptor;
+
+                const dst = path.join('nuxt-packages/stores', path.basename(src));
+
+                this.addTemplate({
+                    src: path.resolve(__dirname, '../templates/store.js'),
+                    fileName: dst,
+                    options: {
+                        path: src.replace('~', name),
+                        name: path.basename(src).split('.')[0]
+                    }
+                });
+
+                // Add plugin to beginning!:
+                this.options.plugins.unshift({
+                    src: path.join(this.options.buildDir, dst),
+                    ssr: true
+                });
+            });
+        }
         
         // Apply all plugins:
         if (plugins) {
