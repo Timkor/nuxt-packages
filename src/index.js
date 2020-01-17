@@ -20,4 +20,4 @@ export default function(moduleOptions) {
     });
 }
 
-export const meta = require('./package.json');P
+export const meta = require('./../package.json');
